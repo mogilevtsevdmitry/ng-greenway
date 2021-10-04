@@ -1,0 +1,84 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type CategoryEntity {
+    createdAt: DateTime!
+    description: String
+    id: ID!
+    img: String
+    link: String
+    logo: String
+    productions: [ProductionEntity!]!
+    title: String
+    updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Mutation {
+    createUser(user: UserInput!): UserEntity!
+    login(user: UserInput!): TokensInput!
+    parsing: Void
+    register(user: UserInput!): UserEntity!
+}
+
+type ProductionEntity {
+    article: String
+    category: CategoryEntity!
+    createdAt: DateTime!
+    description: String
+    id: ID!
+    image: String
+    images: [String!]
+    instructions: String
+    link: String
+    p: Float
+    title: String
+    updatedAt: DateTime!
+    v: Float
+}
+
+type Query {
+    getAllCategories: [CategoryEntity!]
+    getAllUsers: [UserEntity!]!
+    getProduction: [ProductionEntity!]
+    updateToken: TokensInput!
+    whoAmI: UserEntity!
+}
+
+type RefreshTokenEntity {
+    exp: Float!
+    token: String!
+    user: UserEntity!
+}
+
+type Token {
+    exp: Float!
+    token: String!
+}
+
+type TokensInput {
+    accessToken: Token!
+    refreshToken: Token!
+}
+
+type UserEntity {
+    createdAt: DateTime!
+    email: String!
+    id: ID!
+    password: String!
+    token: [RefreshTokenEntity!]!
+    updatedAt: DateTime!
+}
+
+input UserInput {
+    email: String!
+    password: String!
+}
+
+"""Represents NULL values"""
+scalar Void

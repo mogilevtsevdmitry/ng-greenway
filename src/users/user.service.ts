@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { UserEntity } from './user.entity'
 import { Repository } from 'typeorm'
+import { UserInput } from './inputs/user.input'
 
 @Injectable()
 export class UserService {
@@ -23,7 +24,7 @@ export class UserService {
     return await this.repo.findOne({ email })
   }
 
-  async createUser(user: Partial<UserEntity>): Promise<UserEntity> {
+  async createUser(user: UserInput): Promise<UserEntity> {
     return await this.repo.save(user)
   }
 
