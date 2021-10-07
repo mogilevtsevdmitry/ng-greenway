@@ -1,16 +1,19 @@
-import { Module } from '@nestjs/common'
+import { Global, Module } from '@nestjs/common'
 import { PassportModule } from '@nestjs/passport'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { AuthService } from './services/auth.service'
 import { AuthResolver } from './auth.resolver'
 import { UserModule } from '../users/user.module'
-import { JwtStrategy } from './jwt.strategy'
+import { JwtStrategy } from './strategy/jwt.strategy'
 import { TokenService } from './services/token.service'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { RefreshTokenEntity } from './refresh-token.entity'
+import { GoogleStrategy } from './strategy/google.strategy'
+import { AuthController } from './auth.controller'
 
+@Global()
 @Module({
   imports: [
     UserModule,
@@ -27,7 +30,15 @@ import { RefreshTokenEntity } from './refresh-token.entity'
       }),
     }),
   ],
-  providers: [AuthService, AuthResolver, JwtStrategy, TokenService],
+  providers: [
+    AuthService,
+    AuthResolver,
+    JwtStrategy,
+    GoogleStrategy,
+    TokenService,
+  ],
+  controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {
 }

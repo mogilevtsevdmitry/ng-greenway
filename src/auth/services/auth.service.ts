@@ -9,6 +9,7 @@ import { IPayload } from '../interfaces'
 import { TokensInput } from '../inputs/tokens.input'
 import { UserInput } from '../../users/inputs/user.input'
 import { TokenService } from './token.service'
+import { GoogleDto } from '../inputs/google.dto'
 
 
 @Injectable()
@@ -27,7 +28,7 @@ export class AuthService {
       throw new HttpException('Не верный логин или пароль', HttpStatus.UNAUTHORIZED)
     }
     const payload: IPayload = { email: user.email, userId: user.id }
-    return await this.getTokens(payload)
+    return await this.generateTokens(payload)
   }
 
   async register({ email, password }: UserInput): Promise<UserEntity> {
@@ -52,11 +53,7 @@ export class AuthService {
     return null
   }
 
-  private async getTokens(payload: IPayload): Promise<TokensInput> {
-    return await this.generateTokens(payload)
-  }
-
-  private async generateTokens(payload: IPayload): Promise<TokensInput> {
+  async generateTokens(payload: IPayload): Promise<TokensInput> {
     const accessToken = {
       token: 'Bearer ' + this.jwtService.sign(payload),
       exp: new Date(Date.now() + parseInt(this.configService.get<string>('JWT_ACCESS_EXPIRES_IN'))).valueOf(),
@@ -77,5 +74,15 @@ export class AuthService {
       return await this.generateTokens({ email: _refreshToken.user.email, userId: _refreshToken.user.id })
     }
     return null
+  }
+
+  async googleLogin(req): Promise<GoogleDto> {
+    if (!req.user) {
+      return { user: 'No user from google' }
+    }
+
+    return {
+      user: req.user,
+    }
   }
 }

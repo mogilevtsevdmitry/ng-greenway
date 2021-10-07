@@ -14,7 +14,7 @@ export class TokenService {
   }
 
   async createToken(user: UserEntity): Promise<RefreshTokenEntity> {
-    const _token = await this.repo.findOne({ user })
+    const _token = await this.repo.findOne({ user }) || null
     if (_token) {
       await this.repo.remove(_token)
     }

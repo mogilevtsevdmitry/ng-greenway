@@ -1,9 +1,9 @@
-import { Mutation, Query, Resolver } from '@nestjs/graphql'
+import { Query, Resolver } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
 
 import { ProductionService } from './services/production.service'
 import { ProductionEntity } from './entities/production.entity'
-import { GqlAuthGuard } from '../auth/gql-auth.guard'
+import { GqlAuthGuard } from '../auth/guards/gql-auth.guard'
 import { Void } from '../config/scalar-void'
 import { CategoryEntity } from './entities/category.entity'
 
@@ -16,8 +16,8 @@ export class ProductionResolver {
 
   @UseGuards(GqlAuthGuard)
   @Query(() => [ProductionEntity], { nullable: true })
-  async getProduction(): Promise<ProductionEntity[]> {
-    return await this.productionService.getAll()
+  async getAllProductions(): Promise<ProductionEntity[]> {
+    return await this.productionService.getAllProductions()
   }
 
   @UseGuards(GqlAuthGuard)
@@ -26,8 +26,9 @@ export class ProductionResolver {
     return await this.productionService.getAllCategories()
   }
 
-  @Mutation(() => Void, { nullable: true })
+  @Query(() => Void, { nullable: true })
   async parsing(): Promise<void> {
     await this.productionService.updateData()
   }
+
 }

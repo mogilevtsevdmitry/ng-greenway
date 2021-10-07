@@ -18,8 +18,7 @@ interface IProductionInfo {
 @Injectable()
 export class ProductionService {
   private readonly URL: string
-  private readonly delay: number = 60000 // 10 мин
-  private counter: number = 0
+  private readonly delay: number = 3600000 // 60 мин
 
   constructor(
     @InjectRepository(CategoryEntity)
@@ -33,25 +32,28 @@ export class ProductionService {
 
   async updateData(): Promise<void> {
     try {
-      // обновляем или вставляем категории
-      await this.insertOrUpdateCategories_()
-      // обновлем или вставляем продукцию
-      await this.insertOrUpdateProductions_()
+      setInterval(async () => {
+        // обновляем или вставляем категории
+        await this.insertOrUpdateCategories_()
+        // обновлем или вставляем продукцию
+        await this.insertOrUpdateProductions_()
+      }, this.delay)
     } catch (e) {
-      throw new HttpException(`Ошибка парсинга: ${e}`, HttpStatus.FORBIDDEN)
+      throw new HttpException(`Ошибка парсинга: ${e}`, HttpStatus.GATEWAY_TIMEOUT)
     }
   }
 
-  async getAll(options: any = {}): Promise<ProductionEntity[]> {
+  async getAllProductions(options: any = {}): Promise<ProductionEntity[]> {
     return await this.repoProduction.find({
       relations: ['category'],
       where: options,
     })
   }
 
-  async getAllCategories(): Promise<CategoryEntity[]> {
+  async getAllCategories(options: any = {}): Promise<CategoryEntity[]> {
     return await this.repoCategory.find({
       relations: ['productions'],
+      where: options,
     })
   }
 
