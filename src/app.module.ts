@@ -7,6 +7,8 @@ import { ProductionModule } from './production/production.module'
 import { DbConfigService } from './config/db-config.service'
 import { UserModule } from './users/user.module'
 import { AuthModule } from './auth/auth.module'
+import { MailModule } from './mail/mail.module'
+import { NodemailerModule } from './nodemailer/nodemailer.module'
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { AuthModule } from './auth/auth.module'
     UserModule,
     ProductionModule,
     AuthModule,
+    MailModule,
+    NodemailerModule,
   ],
   providers: [DbConfigService],
 })

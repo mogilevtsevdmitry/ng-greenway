@@ -67,12 +67,14 @@ type TokensInput {
 }
 
 type UserEntity {
-  createdAt: DateTime!
+  activateHash: String
+    createdAt: DateTime!
   createdBy: String
   email: String!
   firstName: String
-  id: ID!
-  lastName: String
+    id: ID!
+    isActivated: Boolean!
+    lastName: String
   password: String
   photo: String
   token: [RefreshTokenEntity!]

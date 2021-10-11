@@ -10,6 +10,8 @@ import { TokensInput } from '../inputs/tokens.input'
 import { UserInput } from '../../users/inputs/user.input'
 import { TokenService } from './token.service'
 import { GoogleDto } from '../inputs/google.dto'
+import { MailService } from '../../mail/mail.service'
+import { IMailMessage, NodemailerService } from '../../nodemailer/nodemailer.service'
 
 
 @Injectable()
@@ -19,6 +21,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly tokenService: TokenService,
+    private readonly mailService: MailService,
+    private readonly nodemailerService: NodemailerService,
   ) {
   }
 
@@ -37,6 +41,13 @@ export class AuthService {
       throw new HttpException('Пользователь с таким email уже существует', HttpStatus.CONFLICT)
     }
     const hashedPassword = await AuthHelper.hash(password)
+    const link: string = `${this.configService.get<string>('MAIN_HOST')}${this.configService.get<string>('API_PORT')}/activate?hash=hash`
+    const message: IMailMessage = {
+      to: email,
+      subject: 'Активация учетной записи',
+      html: `Добрый день<br/><br/>Добро пожаловать в наше приложение, для активации учетной записи нажмите на кнопку ниже<br/><br/><a href="${link}">Активировать</a><br/><br/>С уважением, команда разработчиков`,
+    }
+    await this.nodemailerService.sendMessage(message)
     return await this.userService.createUser({ email, password: hashedPassword })
   }
 

@@ -15,6 +15,14 @@ export class UserEntity extends BaseEntity {
   @Column({ nullable: true })
   password: string
 
+  @Field({ defaultValue: false })
+  @Column({ default: false })
+  isActivated: boolean
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  activateHash: string
+
   @Field({ nullable: true })
   @Column({ nullable: true })
   firstName: string

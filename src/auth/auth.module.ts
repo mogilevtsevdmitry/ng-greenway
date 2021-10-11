@@ -12,6 +12,7 @@ import { TokenService } from './services/token.service'
 import { RefreshTokenEntity } from './refresh-token.entity'
 import { GoogleStrategy } from './strategy/google.strategy'
 import { AuthController } from './auth.controller'
+import { NodemailerService } from '../nodemailer/nodemailer.service'
 
 @Global()
 @Module({
@@ -36,6 +37,7 @@ import { AuthController } from './auth.controller'
     JwtStrategy,
     GoogleStrategy,
     TokenService,
+    NodemailerService,
   ],
   controllers: [AuthController],
   exports: [AuthService],
