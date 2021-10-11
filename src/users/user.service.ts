@@ -25,13 +25,22 @@ export class UserService {
     return await this.repo.findOne({ email })
   }
 
+  async getUserByHash(activateHash: string): Promise<UserEntity> {
+    return await this.repo.findOne({ activateHash })
+  }
+
   async createUser(user: UserInput | Partial<UserEntity>): Promise<UserEntity> {
     return await this.repo.save(user)
   }
 
-  async removeUser(id: number): Promise<boolean> {
+  async removeUser(id: number): Promise<UserEntity> {
     const userToDelete = await this.repo.findOne({ id })
-    const removed = await this.repo.remove(userToDelete)
-    return !!removed
+    await this.repo.remove(userToDelete)
+    return userToDelete
+  }
+
+  async updateUser(user: Partial<UserEntity>): Promise<UserEntity> {
+    await this.repo.update({ id: user.id }, { ...user })
+    return await this.getUserById(user.id)
   }
 }

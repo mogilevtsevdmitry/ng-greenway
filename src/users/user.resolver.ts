@@ -7,6 +7,7 @@ import { CurrentUser } from '../auth/current-user.decorator'
 import { UserService } from './user.service'
 import { UserInput } from './inputs/user.input'
 
+@UseGuards(GqlAuthGuard)
 @Resolver('Users')
 export class UserResolver {
   constructor(private readonly userService: UserService) {
@@ -22,9 +23,13 @@ export class UserResolver {
     return await this.userService.getAllUsers()
   }
 
-  @UseGuards(GqlAuthGuard)
   @Query(() => UserEntity)
   async whoAmI(@CurrentUser() user: UserEntity): Promise<UserEntity> {
     return await this.userService.getUserByEmail(user.email)
+  }
+
+  @Mutation(() => UserEntity)
+  async removeUser(@Args('id') id: number): Promise<UserEntity> {
+    return await this.userService.removeUser(id)
   }
 }

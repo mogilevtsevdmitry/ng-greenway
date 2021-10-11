@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
+import { v4 as uuid } from 'uuid'
 
 import { UserService } from '../../users/user.service'
 import { AuthHelper } from '../auth.helper'
@@ -10,7 +11,6 @@ import { TokensInput } from '../inputs/tokens.input'
 import { UserInput } from '../../users/inputs/user.input'
 import { TokenService } from './token.service'
 import { GoogleDto } from '../inputs/google.dto'
-import { MailService } from '../../mail/mail.service'
 import { IMailMessage, NodemailerService } from '../../nodemailer/nodemailer.service'
 
 
@@ -21,7 +21,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly tokenService: TokenService,
-    private readonly mailService: MailService,
     private readonly nodemailerService: NodemailerService,
   ) {
   }
@@ -30,6 +29,9 @@ export class AuthService {
     const user = await this.validateUser(userInput)
     if (!user) {
       throw new HttpException('Не верный логин или пароль', HttpStatus.UNAUTHORIZED)
+    }
+    if (!user.isActivated) {
+      throw new HttpException('Учетная запись не активирована', HttpStatus.UNAUTHORIZED)
     }
     const payload: IPayload = { email: user.email, userId: user.id }
     return await this.generateTokens(payload)
@@ -41,14 +43,20 @@ export class AuthService {
       throw new HttpException('Пользователь с таким email уже существует', HttpStatus.CONFLICT)
     }
     const hashedPassword = await AuthHelper.hash(password)
-    const link: string = `${this.configService.get<string>('MAIN_HOST')}${this.configService.get<string>('API_PORT')}/activate?hash=hash`
+    const hash = uuid()
+    const link: string = `${this.configService.get<string>('MAIN_HOST')}${this.configService.get<string>('API_PORT')}/activate/${hash}`
     const message: IMailMessage = {
       to: email,
       subject: 'Активация учетной записи',
-      html: `Добрый день<br/><br/>Добро пожаловать в наше приложение, для активации учетной записи нажмите на кнопку ниже<br/><br/><a href="${link}">Активировать</a><br/><br/>С уважением, команда разработчиков`,
+      html: `
+        Добрый день<br/><br/>
+        Добро пожаловать в наше приложение, для активации учетной записи нажмите на кнопку ниже<br/><br/>
+        <a href="${link}">Активировать</a><br/><br/>
+        С уважением, команда разработчиков
+    `,
     }
     await this.nodemailerService.sendMessage(message)
-    return await this.userService.createUser({ email, password: hashedPassword })
+    return await this.userService.createUser({ email, password: hashedPassword, activateHash: hash })
   }
 
   async validateUser({ email, password }: UserInput): Promise<Partial<UserEntity>> | null {
@@ -95,5 +103,18 @@ export class AuthService {
     return {
       user: req.user,
     }
+  }
+
+  async activate(hash: string): Promise<TokensInput> {
+    const _user = await this.userService.getUserByHash(hash)
+    if (!_user) {
+      throw new HttpException('Ссылка активации не действительна', HttpStatus.BAD_REQUEST)
+    }
+    await this.userService.updateUser({
+      id: _user.id,
+      activateHash: null,
+      isActivated: true,
+    })
+    return await this.generateTokens({ email: _user.email, userId: _user.id })
   }
 }
