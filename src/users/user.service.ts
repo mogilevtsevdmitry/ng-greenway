@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 
@@ -5,6 +6,11 @@ import { UserEntity } from './user.entity'
 import { Repository } from 'typeorm'
 import { UserInput } from './inputs/user.input'
 
+/**
+ * Class UserService
+ * 
+ * Методы для работы с пользователями системы
+ */
 @Injectable()
 export class UserService {
   constructor(
@@ -12,10 +18,21 @@ export class UserService {
     private readonly repo: Repository<UserEntity>,
   ) {}
 
+  /**
+   * method getAllUsers
+   * 
+   * @returns список всех пользователей
+   */
   async getAllUsers(): Promise<UserEntity[]> {
     return await this.repo.find()
   }
 
+  /**
+   * method getUserById
+   * 
+   * @param {id} Поиск пользователя по переданному id
+   * @returns Возвращает одного пользователя
+   */
   async getUserById(id: number): Promise<UserEntity> {
     return await this.repo.findOne({ id })
   }
