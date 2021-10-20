@@ -5,5 +5,4 @@ import { NodemailerService } from './nodemailer.service'
   providers: [NodemailerService],
   exports: [NodemailerService],
 })
-export class NodemailerModule {
-}
+export class NodemailerModule {}

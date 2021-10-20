@@ -1,4 +1,8 @@
-import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import {
+  CreateDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 import { Field, ID, ObjectType } from '@nestjs/graphql'
 
 @ObjectType({ isAbstract: true })

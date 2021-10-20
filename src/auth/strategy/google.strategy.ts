@@ -10,7 +10,6 @@ import { AuthService } from '../services/auth.service'
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-
   constructor(
     private readonly configService: ConfigService,
     private readonly userService: UserService,
@@ -24,7 +23,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     })
   }
 
-  async validate(googleAccessToken: string, googleRefreshToken: string, profile: any, done: VerifyCallback): Promise<any> {
+  async validate(
+    googleAccessToken: string,
+    googleRefreshToken: string,
+    profile: any,
+    done: VerifyCallback,
+  ): Promise<any> {
     const { name, emails, photos } = profile
     const user = {
       email: emails[0].value,
@@ -32,7 +36,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       lastName: name.familyName,
       picture: photos[0].value,
     }
-    let payload: IPayload = { email: '', userId: 0 }
+    const payload: IPayload = { email: '', userId: 0 }
     const candidate = await this.userService.getUserByEmail(user.email)
     if (!candidate) {
       const _user = new UserEntity()
@@ -48,7 +52,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       payload.userId = candidate.id
       payload.email = candidate.email
     }
-    const { accessToken, refreshToken } = await this.authService.generateTokens(payload)
+    const { accessToken, refreshToken } = await this.authService.generateTokens(
+      payload,
+    )
     done(null, { accessToken, refreshToken })
   }
 }

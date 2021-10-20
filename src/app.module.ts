@@ -27,5 +27,4 @@ import { NodemailerModule } from './nodemailer/nodemailer.module'
   ],
   providers: [DbConfigService],
 })
-export class AppModule {
-}
+export class AppModule {}

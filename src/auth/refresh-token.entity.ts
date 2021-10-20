@@ -14,6 +14,6 @@ export class RefreshTokenEntity {
   exp: number
 
   @Field(() => UserEntity)
-  @ManyToOne(() => UserEntity, user => user.token)
+  @ManyToOne(() => UserEntity, (user) => user.token)
   user: UserEntity
 }

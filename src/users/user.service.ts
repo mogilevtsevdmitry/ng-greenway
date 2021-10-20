@@ -10,8 +10,7 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repo: Repository<UserEntity>,
-  ) {
-  }
+  ) {}
 
   async getAllUsers(): Promise<UserEntity[]> {
     return await this.repo.find()
@@ -34,13 +33,13 @@ export class UserService {
   }
 
   async removeUser(id: number): Promise<UserEntity> {
-    const userToDelete = await this.repo.findOne({ id })
-    await this.repo.remove(userToDelete)
-    return userToDelete
+    const _user = await this.repo.findOne({ id })
+    await this.repo.remove(_user)
+    return _user
   }
 
   async updateUser(user: Partial<UserEntity>): Promise<UserEntity> {
-    await this.repo.update({ id: user.id }, { ...user })
+    await this.repo.update({ id: user.id }, user)
     return await this.getUserById(user.id)
   }
 }

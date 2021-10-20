@@ -39,7 +39,10 @@ export class ProductionService {
         await this.insertOrUpdateProductions_()
       }, this.delay)
     } catch (e) {
-      throw new HttpException(`Ошибка парсинга: ${e}`, HttpStatus.GATEWAY_TIMEOUT)
+      throw new HttpException(
+        `Ошибка парсинга: ${e}`,
+        HttpStatus.GATEWAY_TIMEOUT,
+      )
     }
   }
 
@@ -64,11 +67,17 @@ export class ProductionService {
       // получаем категории путем парсинга с сайта
       const categories = await this.getCategories()
       // получаем новые категории
-      const newCategories = categories.filter(cat => !categoriesFromDb.map(c => c.title).includes(cat.title))
+      const newCategories = categories.filter(
+        (cat) => !categoriesFromDb.map((c) => c.title).includes(cat.title),
+      )
       // фильтруем данные для обновления
-      const categoriesToUpdate = categories.filter(cat => categoriesFromDb.map(c => c.title).includes(cat.title))
+      const categoriesToUpdate = categories.filter((cat) =>
+        categoriesFromDb.map((c) => c.title).includes(cat.title),
+      )
       // Категории к удалению
-      const categoriesToDelete = categoriesFromDb.filter(cat => !categories.map(c => c.title).includes(cat.title))
+      const categoriesToDelete = categoriesFromDb.filter(
+        (cat) => !categories.map((c) => c.title).includes(cat.title),
+      )
       // если появились новые категории - выполняем их вставку в бд
       if (newCategories.length > 0) {
         await this.repoCategory.save(newCategories)
@@ -76,7 +85,10 @@ export class ProductionService {
       // обновляем данные в бд
       if (categoriesToUpdate.length > 0) {
         for (const category of categoriesToUpdate) {
-          await this.repoCategory.update({ title: category.title }, { ...category })
+          await this.repoCategory.update(
+            { title: category.title },
+            { ...category },
+          )
         }
       }
       // удаляем категории
@@ -91,7 +103,6 @@ export class ProductionService {
       // Получаем все категории с БД, т.к. будем итерироваться по ссылке на продукцию
       const categories = await this.repoCategory.find()
       for (const category of categories) {
-
         // Продукция по переданной ссылке категории
         const productions = await this.getItems(category.link)
 
@@ -99,7 +110,7 @@ export class ProductionService {
         const productionToDelete = await this.repoProduction.find({
           where: {
             // фильтруем по продукции которая есть в БД, но нет на сайте
-            title: Not([...new Set(productions.map(p => p.title))]),
+            title: Not([...new Set(productions.map((p) => p.title))]),
             category,
           },
         })
@@ -110,9 +121,13 @@ export class ProductionService {
 
         for (const production of productions) {
           const productionInfo = await this.getItemInfo(production.link)
-          const newProd = Object.assign(production, productionInfo, { category })
+          const newProd = Object.assign(production, productionInfo, {
+            category,
+          })
           console.log('newProd', newProd)
-          const candidate = await this.repoProduction.findOne({ where: { article: production.article } })
+          const candidate = await this.repoProduction.findOne({
+            where: { article: production.article },
+          })
           if (candidate) {
             // Обновляем поля
             await this.repoProduction.update(candidate.id, { ...newProd })
@@ -127,24 +142,19 @@ export class ProductionService {
     }
   }
 
-  private async getCategories(): Promise<ICategory[]> {
+  async getCategories(): Promise<ICategory[]> {
     return new Promise<ICategory[]>((resolve) => {
       request(`${this.URL}/rus/`, (err, res, body) => {
         const categories: ICategory[] = []
         if (err) throw err
         const $ = cheerio.load(body)
+        console.log('$', $)
         $('.product-item').each((i) => {
-          const link = `${this.URL}${$('.product-item>a')
-            .eq(i)
-            .attr('href')}`
-          const logo = `${this.URL}${$('.brand-logo')
-            .eq(i)
-            .attr('src')}`
+          const link = `${this.URL}${$('.product-item>a').eq(i).attr('href')}`
+          const logo = `${this.URL}${$('.brand-logo').eq(i).attr('src')}`
           const title = $('.product-title').eq(i).text()
           const description = $('.product-info>p').eq(i).text()
-          const img = `${this.URL}${$('.product-img')
-            .eq(i)
-            .attr('src')}`
+          const img = `${this.URL}${$('.product-img').eq(i).attr('src')}`
           categories.push({
             link,
             logo,
@@ -153,6 +163,7 @@ export class ProductionService {
             img,
           })
         })
+        console.log('categories', categories)
         resolve(categories)
       })
     })
@@ -165,12 +176,22 @@ export class ProductionService {
         if (err) throw err
         const $ = cheerio.load(body)
         $('.catalog-item').each((i) => {
-          const link = `${this.URL}${$('.wrap-catalog-img>a').eq(i).attr('href')}`
-          const image = `${this.URL}${$('.catalog-item-img>img').eq(i).attr('src')}`
+          const link = `${this.URL}${$('.wrap-catalog-img>a')
+            .eq(i)
+            .attr('href')}`
+          const image = `${this.URL}${$('.catalog-item-img>img')
+            .eq(i)
+            .attr('src')}`
           const article = $('.catalog-item-code').eq(i).text()
-          const title = $('.catalog-item-title').eq(i)[0].children[0]['data'].trim()
+          const title = $('.catalog-item-title')
+            .eq(i)[0]
+            .children[0]['data'].trim()
           const description = $('.catalog-item-title>span').eq(i).text()
-          const itemInfo = $('.catalog-item-info').eq(i).children('p').text().split(' ')
+          const itemInfo = $('.catalog-item-info')
+            .eq(i)
+            .children('p')
+            .text()
+            .split(' ')
           const v = this.getValFromItemInfo(itemInfo, 'объём')
           const p = this.getValFromItemInfo(itemInfo, 'цена')
           items.push({
@@ -215,5 +236,4 @@ export class ProductionService {
         .filter((e) => e !== 0)[0] || 0
     )
   }
-
 }

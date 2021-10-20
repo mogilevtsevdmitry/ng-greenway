@@ -29,10 +29,8 @@ export class CategoryEntity extends BaseEntity implements ICategory {
   title: string
 
   @Field(() => [ProductionEntity])
-  @OneToMany(
-    () => ProductionEntity,
-    production => production.category,
-    { cascade: true },
-  )
+  @OneToMany(() => ProductionEntity, (production) => production.category, {
+    cascade: true,
+  })
   productions: ProductionEntity[]
 }

@@ -40,6 +40,6 @@ export class UserEntity extends BaseEntity {
   createdBy: string
 
   @Field(() => [RefreshTokenEntity], { nullable: true })
-  @OneToMany(() => RefreshTokenEntity, token => token.token)
+  @OneToMany(() => RefreshTokenEntity, (token) => token.token)
   token: RefreshTokenEntity[]
 }

@@ -10,8 +10,7 @@ import { UserInput } from './inputs/user.input'
 @UseGuards(GqlAuthGuard)
 @Resolver('Users')
 export class UserResolver {
-  constructor(private readonly userService: UserService) {
-  }
+  constructor(private readonly userService: UserService) {}
 
   @Mutation(() => UserEntity)
   async createUser(@Args('user') user: UserInput): Promise<UserEntity> {

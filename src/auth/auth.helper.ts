@@ -6,7 +6,10 @@ export class AuthHelper {
     return hashSync(password, salt)
   }
 
-  static async compare(password: string, hashedPassword: string): Promise<boolean> {
+  static async compare(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
     return await compare(password, hashedPassword)
   }
 }

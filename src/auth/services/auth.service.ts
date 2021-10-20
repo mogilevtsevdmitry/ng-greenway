@@ -11,8 +11,10 @@ import { TokensInput } from '../inputs/tokens.input'
 import { UserInput } from '../../users/inputs/user.input'
 import { TokenService } from './token.service'
 import { GoogleDto } from '../inputs/google.dto'
-import { IMailMessage, NodemailerService } from '../../nodemailer/nodemailer.service'
-
+import {
+  IMailMessage,
+  NodemailerService,
+} from '../../nodemailer/nodemailer.service'
 
 @Injectable()
 export class AuthService {
@@ -22,16 +24,21 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly tokenService: TokenService,
     private readonly nodemailerService: NodemailerService,
-  ) {
-  }
+  ) {}
 
   async login(userInput: UserInput): Promise<TokensInput> {
     const user = await this.validateUser(userInput)
     if (!user) {
-      throw new HttpException('Не верный логин или пароль', HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Не верный логин или пароль',
+        HttpStatus.UNAUTHORIZED,
+      )
     }
     if (!user.isActivated) {
-      throw new HttpException('Учетная запись не активирована', HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Учетная запись не активирована',
+        HttpStatus.UNAUTHORIZED,
+      )
     }
     const payload: IPayload = { email: user.email, userId: user.id }
     return await this.generateTokens(payload)
@@ -40,11 +47,16 @@ export class AuthService {
   async register({ email, password }: UserInput): Promise<UserEntity> {
     const user = await this.userService.getUserByEmail(email)
     if (user) {
-      throw new HttpException('Пользователь с таким email уже существует', HttpStatus.CONFLICT)
+      throw new HttpException(
+        'Пользователь с таким email уже существует',
+        HttpStatus.CONFLICT,
+      )
     }
     const hashedPassword = await AuthHelper.hash(password)
     const hash = uuid()
-    const link: string = `${this.configService.get<string>('MAIN_HOST')}${this.configService.get<string>('API_PORT')}/activate/${hash}`
+    const link = `${this.configService.get<string>(
+      'MAIN_HOST',
+    )}${this.configService.get<string>('API_PORT')}/activate/${hash}`
     const message: IMailMessage = {
       to: email,
       subject: 'Активация учетной записи',
@@ -56,10 +68,17 @@ export class AuthService {
     `,
     }
     await this.nodemailerService.sendMessage(message)
-    return await this.userService.createUser({ email, password: hashedPassword, activateHash: hash })
+    return await this.userService.createUser({
+      email,
+      password: hashedPassword,
+      activateHash: hash,
+    })
   }
 
-  async validateUser({ email, password }: UserInput): Promise<Partial<UserEntity>> | null {
+  async validateUser({
+    email,
+    password,
+  }: UserInput): Promise<Partial<UserEntity>> | null {
     const user = await this.userService.getUserByEmail(email)
     if (user) {
       const isMatch = await AuthHelper.compare(password, user.password)
@@ -75,12 +94,16 @@ export class AuthService {
   async generateTokens(payload: IPayload): Promise<TokensInput> {
     const accessToken = {
       token: 'Bearer ' + this.jwtService.sign(payload),
-      exp: new Date(Date.now() + parseInt(this.configService.get<string>('JWT_ACCESS_EXPIRES_IN'))).valueOf(),
+      exp: new Date(
+        Date.now() +
+          parseInt(this.configService.get<string>('JWT_ACCESS_EXPIRES_IN')),
+      ).valueOf(),
     }
     const user = await this.userService.getUserById(payload.userId)
     const refreshToken = await this.tokenService.createToken(user)
     return {
-      accessToken, refreshToken: {
+      accessToken,
+      refreshToken: {
         token: refreshToken.token,
         exp: refreshToken.exp,
       },
@@ -90,7 +113,10 @@ export class AuthService {
   async updateToken(refreshToken: string): Promise<TokensInput> | null {
     const _refreshToken = await this.tokenService.getToken(refreshToken)
     if (_refreshToken) {
-      return await this.generateTokens({ email: _refreshToken.user.email, userId: _refreshToken.user.id })
+      return await this.generateTokens({
+        email: _refreshToken.user.email,
+        userId: _refreshToken.user.id,
+      })
     }
     return null
   }
@@ -108,7 +134,10 @@ export class AuthService {
   async activate(hash: string): Promise<TokensInput> {
     const _user = await this.userService.getUserByHash(hash)
     if (!_user) {
-      throw new HttpException('Ссылка активации не действительна', HttpStatus.BAD_REQUEST)
+      throw new HttpException(
+        'Ссылка активации не действительна',
+        HttpStatus.BAD_REQUEST,
+      )
     }
     await this.userService.updateUser({
       id: _user.id,

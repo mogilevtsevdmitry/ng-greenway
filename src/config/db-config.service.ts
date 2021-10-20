@@ -4,11 +4,7 @@ import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm'
 
 @Injectable()
 export class DbConfigService implements TypeOrmOptionsFactory {
-
-  constructor(
-    private readonly configService: ConfigService,
-  ) {
-  }
+  constructor(private readonly configService: ConfigService) {}
 
   createTypeOrmOptions(): Promise<TypeOrmModuleOptions> | TypeOrmModuleOptions {
     return {
@@ -25,5 +21,4 @@ export class DbConfigService implements TypeOrmOptionsFactory {
       logging: true,
     }
   }
-
 }

@@ -9,10 +9,7 @@ import { CategoryEntity } from './entities/category.entity'
 
 @Resolver('Production')
 export class ProductionResolver {
-  constructor(
-    private readonly productionService: ProductionService,
-  ) {
-  }
+  constructor(private readonly productionService: ProductionService) {}
 
   @UseGuards(GqlAuthGuard)
   @Query(() => [ProductionEntity], { nullable: true })
@@ -30,5 +27,4 @@ export class ProductionResolver {
   async parsing(): Promise<void> {
     await this.productionService.updateData()
   }
-
 }

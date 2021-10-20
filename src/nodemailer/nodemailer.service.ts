@@ -14,10 +14,7 @@ export interface IMailMessage {
 export class NodemailerService {
   private transporter: any
 
-  constructor(
-    private readonly configService: ConfigService,
-  ) {
-  }
+  constructor(private readonly configService: ConfigService) {}
 
   private async createTransporter() {
     this.transporter = nodemailer.createTransport({
@@ -45,4 +42,3 @@ export class NodemailerService {
     this.transporter.close()
   }
 }
-

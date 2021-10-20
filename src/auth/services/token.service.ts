@@ -10,11 +10,10 @@ export class TokenService {
   constructor(
     @InjectRepository(RefreshTokenEntity)
     private readonly repo: Repository<RefreshTokenEntity>,
-  ) {
-  }
+  ) {}
 
   async createToken(user: UserEntity): Promise<RefreshTokenEntity> {
-    const _token = await this.repo.findOne({ user }) || null
+    const _token = (await this.repo.findOne({ user })) || null
     if (_token) {
       await this.repo.remove(_token)
     }
@@ -25,7 +24,10 @@ export class TokenService {
   }
 
   async getToken(refreshToken: string): Promise<RefreshTokenEntity> | null {
-    const _token = await this.repo.findOne({ token: refreshToken }, { relations: ['user'] })
+    const _token = await this.repo.findOne(
+      { token: refreshToken },
+      { relations: ['user'] },
+    )
     if (new Date(_token.exp) < new Date()) {
       return null
     }

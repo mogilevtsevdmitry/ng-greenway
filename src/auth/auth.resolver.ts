@@ -7,8 +7,7 @@ import { UserInput } from '../users/inputs/user.input'
 
 @Resolver('Auth')
 export class AuthResolver {
-  constructor(private readonly auth: AuthService) {
-  }
+  constructor(private readonly auth: AuthService) {}
 
   @Mutation(() => TokensInput)
   async login(@Args('user') user: UserInput): Promise<TokensInput> {

@@ -23,7 +23,7 @@ type Mutation {
   createUser(user: UserInput!): UserEntity!
   login(user: UserInput!): TokensInput!
   register(user: UserInput!): UserEntity!
-    removeUser(id: Float!): UserEntity!
+  removeUser(id: Float!): UserEntity!
 }
 
 type ProductionEntity {
@@ -68,18 +68,18 @@ type TokensInput {
 }
 
 type UserEntity {
-    activateHash: String
-    createdAt: DateTime!
-    createdBy: String
-    email: String!
-    firstName: String
-    id: ID!
-    isActivated: Boolean!
-    lastName: String
-    password: String
-    photo: String
-    token: [RefreshTokenEntity!]
-    updatedAt: DateTime!
+  activateHash: String
+  createdAt: DateTime!
+  createdBy: String
+  email: String!
+  firstName: String
+  id: ID!
+  isActivated: Boolean!
+  lastName: String
+  password: String
+  photo: String
+  token: [RefreshTokenEntity!]
+  updatedAt: DateTime!
 }
 
 input UserInput {

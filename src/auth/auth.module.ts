@@ -42,5 +42,4 @@ import { NodemailerService } from '../nodemailer/nodemailer.service'
   controllers: [AuthController],
   exports: [AuthService],
 })
-export class AuthModule {
-}
+export class AuthModule {}

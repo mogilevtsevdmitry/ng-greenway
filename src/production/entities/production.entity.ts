@@ -45,9 +45,6 @@ export class ProductionEntity extends BaseEntity implements IProduction {
   images: string[]
 
   @Field(() => CategoryEntity)
-  @ManyToOne(
-    () => CategoryEntity,
-    category => category.productions,
-  )
+  @ManyToOne(() => CategoryEntity, (category) => category.productions)
   category: CategoryEntity
 }
