@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 
 import { ProductionModule } from './production/production.module'
@@ -16,9 +16,25 @@ import { NodemailerModule } from './nodemailer/nodemailer.module'
       inject: [DbConfigService],
     }),
     ConfigModule.forRoot({ isGlobal: true }),
-    GraphQLModule.forRoot({
-      autoSchemaFile: 'schema.gql',
-      sortSchema: true,
+    GraphQLModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        autoSchemaFile: 'schema.gql',
+        sortSchema: true,
+        cors: {
+          origin: `${configService.get<string>(
+            'MAIN_HOST',
+          )}${configService.get<string>('API_PORT')}`,
+          credentials: true,
+        },
+        context: ({ req, res }) => ({ req, res }),
+        playground: {
+          settings: {
+            'request.credentials': 'include',
+          },
+        },
+      }),
     }),
     UserModule,
     ProductionModule,

@@ -1,17 +1,29 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { ConfigService } from '@nestjs/config'
 
 import { AuthService } from './services/auth.service'
-import { TokensInput } from './inputs/tokens.input'
+import { Token, TokensInput } from './inputs/tokens.input'
 import { UserEntity } from '../users/user.entity'
 import { UserInput } from '../users/inputs/user.input'
 
 @Resolver('Auth')
 export class AuthResolver {
-  constructor(private readonly auth: AuthService) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Mutation(() => TokensInput)
-  async login(@Args('user') user: UserInput): Promise<TokensInput> {
-    return await this.auth.login(user)
+  async login(
+    @Args('user') user: UserInput,
+    @Context() context,
+  ): Promise<TokensInput> {
+    const tokens = await this.auth.login(user)
+    context.res.cookie('refreshtoken', tokens.refreshToken, {
+      httpOnly: true,
+      age: this.config.get<string>('JWT_REFRESH_EXPIRES_IN'),
+    })
+    return tokens
   }
 
   @Mutation(() => UserEntity)
@@ -20,11 +32,13 @@ export class AuthResolver {
   }
 
   @Query(() => TokensInput)
-  async updateToken(@Context('req') req): Promise<TokensInput> | null {
-    const refreshToken = req?.headers?.refreshtoken
-    if (!refreshToken) {
+  async updateToken(@Context() context): Promise<TokensInput> | null {
+    const refreshToken: Token = context.req.cookies['refreshtoken']
+    console.log('refreshToken', refreshToken)
+
+    if (!refreshToken || new Date() > new Date(refreshToken.exp)) {
       return null
     }
-    return await this.auth.updateToken(refreshToken)
+    return await this.auth.updateToken(refreshToken.token)
   }
 }

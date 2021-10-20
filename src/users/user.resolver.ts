@@ -3,9 +3,9 @@ import { UseGuards } from '@nestjs/common'
 
 import { UserEntity } from './user.entity'
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard'
-import { CurrentUser } from '../auth/current-user.decorator'
 import { UserService } from './user.service'
 import { UserInput } from './inputs/user.input'
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator'
 
 @UseGuards(GqlAuthGuard)
 @Resolver('Users')
