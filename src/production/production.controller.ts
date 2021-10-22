@@ -4,14 +4,10 @@ import { ICategory } from './interfaces/category.interface'
 
 @Controller('')
 export class ProductionController {
-  constructor(
-    private readonly service: ProductionService
-  ) {
-  }
+  constructor(private readonly service: ProductionService) {}
 
   @Get('/categories')
   async getCategories(): Promise<ICategory[]> {
     return this.service.getCategories()
   }
-
 }

@@ -19,7 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "doc": "npx @compodoc/compodoc -p tsconfig.json -s"
+    "doc": "npx @compodoc/compodoc -p tsconfig.json -s -n \"Backend start template documentation\" -o"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.0",

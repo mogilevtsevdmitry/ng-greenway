@@ -7,9 +7,7 @@ import { Repository } from 'typeorm'
 import { UserInput } from './inputs/user.input'
 
 /**
- * Class UserService
- * 
- * Методы для работы с пользователями системы
+ * Сервис для работы с пользователями
  */
 @Injectable()
 export class UserService {
@@ -19,32 +17,36 @@ export class UserService {
   ) {}
 
   /**
-   * method getAllUsers
-   * 
-   * @returns список всех пользователей
+   * Метод для получения всех пользователей
    */
   async getAllUsers(): Promise<UserEntity[]> {
     return await this.repo.find()
   }
 
   /**
-   * method getUserById
-   * 
-   * @param {id} Поиск пользователя по переданному id
-   * @returns Возвращает одного пользователя
+   * Метод возвращающий одного пользователя по его id
    */
   async getUserById(id: number): Promise<UserEntity> {
     return await this.repo.findOne({ id })
   }
 
+  /**
+   * Возвращаем пользователя по его email
+   */
   async getUserByEmail(email: string): Promise<UserEntity> {
     return await this.repo.findOne({ email })
   }
 
+  /**
+   * Возвращаем пользователя по уникальному хэшу, сгенерированному для активации пользователя
+   */
   async getUserByHash(activateHash: string): Promise<UserEntity> {
     return await this.repo.findOne({ activateHash })
   }
 
+  /**
+   * Создаем пользователя
+   */
   async createUser(user: UserInput | Partial<UserEntity>): Promise<UserEntity> {
     return await this.repo.save(user)
   }

@@ -4,17 +4,29 @@ import { Field, ObjectType } from '@nestjs/graphql'
 import { RefreshTokenEntity } from '../auth/refresh-token.entity'
 import { SOCIAL_NETWORKS } from '../auth/interfaces'
 
+/**
+ * Сущность пользователя
+ */
 @ObjectType()
 @Entity('users')
 export class UserEntity extends BaseEntity {
+  /**
+   * Email пользователя
+   */
   @Field({ nullable: false })
   @Column()
   email: string
 
+  /**
+   * Пароль пользователя
+   */
   @Field({ nullable: true })
   @Column({ nullable: true })
   password: string
 
+  /**
+   * Признак активации пользователя
+   */
   @Field({ defaultValue: false })
   @Column({ default: false })
   isActivated: boolean
