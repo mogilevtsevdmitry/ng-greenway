@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import { v4 as uuid } from 'uuid'
 
-import { UserService } from '../../users/user.service'
+import { UserService } from '../../users/services/user.service'
 import { AuthHelper } from '../auth.helper'
 import { UserEntity } from '../../users/user.entity'
 import { IPayload } from '../interfaces'

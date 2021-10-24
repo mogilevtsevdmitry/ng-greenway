@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config'
 
 import { IPayload, SOCIAL_NETWORKS } from '../interfaces'
 import { UserEntity } from '../../users/user.entity'
-import { UserService } from '../../users/user.service'
+import { UserService } from '../../users/services/user.service'
 import { AuthService } from '../services/auth.service'
 
 @Injectable()
